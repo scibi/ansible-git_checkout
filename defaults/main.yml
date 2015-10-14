@@ -1,0 +1,42 @@
+---
+
+# .. envvar:: git_checkout_name
+#
+# Name of the checkout. Must be unique. Role run results are available as
+# git_checkout_register_status[git_checkout_name]
+git_checkout_name: 'sample_checkout'
+
+# .. envvar:: git_checkout_src_path
+#
+# Path of the bare repository
+git_checkout_src_path: '{{ ansible_local.root.src + "/" + git_checkout_name }}'
+
+# .. envvar:: git_checkout_app_root_path
+#
+# Application installation directory
+git_checkout_app_path: '{{ ansible_local.root.app + "/" + git_checkout_name }}'
+
+
+# .. envvar:: git_checkout_app_repo_url:
+#
+# Upstream repository URL
+git_checkout_app_repo_url: 'https://github.com/{{ git_checkout_name }}/{{ git_checkout_name }}.git'
+
+
+# .. envvar:: git_checkout_user
+#
+# System user for checkout
+git_checkout_user: '{{ git_checkout_name }}'
+
+
+# .. envvar:: git_checkout_group
+#
+# System group for checkout
+git_checkout_group: '{{ git_checkout_name }}'
+
+
+# .. envvar:: git_checkout_version
+#
+# What version (branch, tag or commit id)  to checkout
+git_checkout_version: 'master'
+

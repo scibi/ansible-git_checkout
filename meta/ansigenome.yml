@@ -1,0 +1,23 @@
+---
+
+ansigenome_info:
+  github_url: "https://github.com/debops/ansible-git_checkout"
+  git_branch: "master"
+  galaxy_id: ""
+
+  travis: True
+
+  license_url: 'https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)'
+
+  authors:
+    - name:  'Patryk Ściborek'
+      url: ''
+      email: 'patryk@sciborek.com'
+      twitter: ''
+      github: 'scibi'
+
+  synopsis: |
+    This role checks out any git repository. It's meant to be used as a dependency
+    where it can be specified multiple times. Result is saved to the dict
+    `git_checkout_register_status` under a key `git_checkout_name`.
+

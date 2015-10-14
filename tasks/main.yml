@@ -1,0 +1,164 @@
+---
+- name: Make sure git is installed
+  apt:
+    name: 'git'
+    state: 'latest'
+    install_recommends: False
+
+- name: 'Create {{ git_checkout_group }} group'
+  group:
+    name: '{{ git_checkout_group }}'
+    system: True
+    state: 'present'
+
+- name: 'Create {{ git_checkout_user }} user'
+  user:
+    name: '{{ git_checkout_user }}'
+    group: '{{ git_checkout_group }}'
+    home: '{{ git_checkout_app_path }}'
+    comment: '{{ git_checkout_name }}'
+    createhome: False
+    append: True
+    system: True
+    state: 'present'
+
+- name: git_checkout_src_path
+  debug:
+    msg: '{{ git_checkout_src_path }}'
+
+- name: git_checkout_app_path
+  debug:
+    msg: '{{ git_checkout_app_path }}'
+
+- name: Check if bare repository is cloned
+  stat:
+    path: '{{ git_checkout_src_path }}'
+  register: git_checkout_register_repo_cloned
+
+- name: git_checkout_register_repo_cloned
+  debug:
+    msg: '{{ git_checkout_register_repo_cloned }}'
+
+- name: Save current checkout hash for update
+  shell: git rev-parse HEAD
+  args:
+    chdir: '{{ git_checkout_src_path }}'
+  register: git_checkout_register_current_head
+  changed_when: False
+  sudo_user: '{{ git_checkout_user }}'
+  when: git_checkout_register_repo_cloned.stat.exists
+
+
+- name: Change current HEAD to master in bare repository for update
+  shell: git symbolic-ref HEAD refs/heads/master
+  args:
+    chdir: '{{ git_checkout_src_path }}'
+  changed_when: False
+  sudo_user: '{{ git_checkout_user }}'
+  when: git_checkout_register_repo_cloned.stat.exists
+
+- name: 'Create {{ git_checkout_name }} bare repo directory ({{ git_checkout_src_path }})'
+  file:
+    path: '{{ git_checkout_src_path }}'
+    state: 'directory'
+    owner: '{{ git_checkout_user }}'
+    group: '{{ git_checkout_group }}'
+    mode: '0755'
+
+- name: 'Clone {{ git_checkout_name }} source code'
+  git:
+    repo: '{{ git_checkout_app_repo_url }}'
+    dest: '{{ git_checkout_src_path }}'
+    bare: True
+    update: True
+  sudo_user: '{{ git_checkout_user }}'
+
+- name: Restore HEAD to previous checkout
+  copy:
+    content: '{{ git_checkout_register_current_head.stdout }}'
+    dest: '{{ git_checkout_src_path + "/HEAD" }}'
+    owner: '{{ git_checkout_user }}'
+    group: '{{ git_checkout_group }}'
+    mode: '0644'
+  changed_when: False
+  when: git_checkout_register_repo_cloned.stat.exists
+
+- name: 'Check if {{ git_checkout_name }} is checked out'
+  stat:
+    path: '{{ git_checkout_app_path }}'
+  register: git_checkout_register_app_directory
+
+- name: git_checkout_register_app_directory
+  debug:
+    msg: '{{ git_checkout_register_app_directory }}'
+
+- name: 'Create {{ git_checkout_name }} checkout directory ({{ git_checkout_app_path }})'
+  file:
+    path: '{{ git_checkout_app_path }}'
+    state: 'directory'
+    owner: '{{ git_checkout_user }}'
+    group: '{{ git_checkout_group }}'
+    mode: '0755'
+
+- name: 'Prepare {{ git_checkout_name }} worktree'
+  copy:
+    content: 'gitdir: {{ git_checkout_src_path }}'
+    dest: '{{ git_checkout_app_path + "/.git" }}'
+    owner: '{{ git_checkout_user }}'
+    group: '{{ git_checkout_group }}'
+    mode: '0644'
+
+- name: Get currently checked out git tag
+  shell: git describe --tags
+  environment:
+    GIT_WORK_TREE: '{{ git_checkout_app_path }}'
+  args:
+    chdir: '{{ git_checkout_src_path }}'
+  sudo_user: '{{ git_checkout_user }}'
+  register: git_checkout_register_target_tag
+  changed_when: (git_checkout_version != git_checkout_register_target_tag.stdout)
+
+- name: git_checkout_register_target_tag
+  debug:
+    msg: '{{ git_checkout_register_target_tag }}'
+
+- name: 'Checkout {{ git_checkout_name }}'
+  shell: 'git checkout -f {{ git_checkout_version }}'
+  environment:
+    GIT_WORK_TREE: '{{ git_checkout_app_path }}'
+  args:
+    chdir: '{{ git_checkout_src_path }}'
+  sudo_user: '{{ git_checkout_user }}'
+  register: git_checkout_register_checkout
+  when: (git_checkout_version != git_checkout_register_target_tag.stdout) or not git_checkout_register_repo_cloned.stat.exists
+
+- name: git_checkout_register_checkout
+  debug:
+    msg: '{{ git_checkout_register_checkout }}'
+
+- name: Set output facts
+  set_fact:
+    git_checkout_register_status_tmp:
+      updated: '{{ git_checkout_register_target_tag.changed }}'
+      installed: '{{ not git_checkout_register_repo_cloned.stat.exists }}'
+      changed: '{{ git_checkout_register_target_tag.changed or not git_checkout_register_repo_cloned.stat.exists }}'
+
+- name: git_checkout_register_status_tmp
+  debug:
+    msg: '{{ git_checkout_register_status_tmp }}'
+
+- name: Make sure git_checkout_register_status is a dict
+  set_fact:
+    git_checkout_register_status: '{{ git_checkout_register_status|d({}) }}'
+
+- name: git_checkout_register_status
+  debug:
+    msg: '{{ git_checkout_register_status }}'
+
+- name: Update git_checkout_register_status
+  set_fact:
+    git_checkout_register_status: '{{ dict(git_checkout_register_status.items() + [(git_checkout_name, git_checkout_register_status_tmp)]) }}'
+
+- name: git_checkout_register_status
+  debug:
+    msg: '{{ git_checkout_register_status }}'
