@@ -1,0 +1,55 @@
+---
+
+- name: git_checkout_deploy_key_token
+  debug:
+    msg: '{{ git_checkout_deploy_key_token }}'      
+
+- name: Slurp the deploy key
+  slurp:
+    src: '{{ git_checkout_app_home_path }}/.ssh/id_rsa.pub'
+  register: git_checkout_register_deploy_key
+
+- name: git_checkout_register_deploy_key
+  debug:
+    msg: '{{ git_checkout_register_deploy_key }}'
+
+- name: Create a json formatted deploy key
+  set_fact:
+    git_checkout_register_deploy_key_data:
+      title: '{{ git_checkout_name }}@{{ ansible_fqdn }} deployed by Ansible'
+      key: '{{ git_checkout_register_deploy_key.content | b64decode | trim }}'
+
+- name: git_checkout_register_deploy_key_data
+  debug:
+    msg: '{{ git_checkout_register_deploy_key_data }}'
+
+# Deploy on GitLab server
+
+- name: Get the Gitlab repo id
+  uri:
+    url: 'https://{{ git_checkout_git_service_host }}/api/v3/projects/{{ git_checkout_git_service_account }}%2F{{ git_checkout_git_service_repo }}'
+    HEADER_PRIVATE-TOKEN: '{{ git_checkout_deploy_key_token }}'
+  register: git_checkout_register_gitlab_response
+  when: git_checkout_git_service_type == 'gitlab'
+
+# Have to use this syntax. Using colons leads to TypeError: unhashable type
+- name: Transfer the deploy key to Gitlab
+  uri:
+    url: 'https://{{ git_checkout_git_service_host }}/api/v3/projects/{{ git_checkout_register_gitlab_response.json.id }}/keys'
+    method: 'POST'
+    body_format: 'json'
+    body: '{{ git_checkout_register_deploy_key_data }}'
+    HEADER_PRIVATE-TOKEN: '{{ git_checkout_deploy_key_token }}'
+    status_code: '200,201'
+  when: git_checkout_git_service_type == 'gitlab'
+
+# Deploy on Github
+#
+#FIXME: add Github support
+
+- name: Add server key do known hosts
+  known_hosts:
+    name: '{{ git_checkout_git_service_host }}'
+    key: '{{ git_checkout_git_service_sshkey }}'  
+  sudo_user: '{{ git_checkout_user }}'
+  when: git_checkout_git_service_sshkey

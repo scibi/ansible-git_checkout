@@ -7,20 +7,32 @@
 git_checkout_name: 'sample_checkout'
 
 # .. envvar:: git_checkout_src_path
-#
+# FIXME
 # Path of the bare repository
 git_checkout_src_path: '{{ ansible_local.root.src + "/" + git_checkout_name }}'
 
 # .. envvar:: git_checkout_app_root_path
-#
+# FIXME
 # Application installation directory
 git_checkout_app_path: '{{ ansible_local.root.app + "/" + git_checkout_name }}'
 
+# .. envvar:: git_checkout_app_home_path
+# FIXME
+# Application installation directory
+git_checkout_app_home_path: '{{ ansible_local.root.app + "/" + git_checkout_name }}'
 
-# .. envvar:: git_checkout_app_repo_url:
+# Git service data
+# This role supports GitHub and GitLab
+git_checkout_git_service_host: 'github.com'
+git_checkout_git_service_type: "{% if 'github' in git_checkout_git_service_host %}github{% else %}gitlab{% endif %}"
+git_checkout_git_service_account: '{{ git_checkout_name }}'
+git_checkout_git_service_repo: '{{ git_checkout_name }}'
+git_checkout_git_service_sshkey: False
+
+# .. envvar:: git_checkout_repo_url:
 #
 # Upstream repository URL
-git_checkout_app_repo_url: 'https://github.com/{{ git_checkout_name }}/{{ git_checkout_name }}.git'
+git_checkout_repo_url: '{% if git_checkout_deploy_key_enable|bool %}git@{{ git_checkout_git_service_host }}:{% else %}https://{{ git_checkout_git_service_host }}/{% endif %}{{ git_checkout_git_service_account }}/{{ git_checkout_git_service_repo }}.git'
 
 
 # .. envvar:: git_checkout_user
@@ -39,4 +51,8 @@ git_checkout_group: '{{ git_checkout_name }}'
 #
 # What version (branch, tag or commit id)  to checkout
 git_checkout_version: 'master'
+
+git_checkout_deploy_key_enable: False
+
+git_checkout_deploy_key_token: "{{ lookup('file', secret + '/git_checkout/' + git_checkout_repo_url | replace('/', '_') | replace('@', '_') | replace(':', '_') + '/token' ) }}"
 

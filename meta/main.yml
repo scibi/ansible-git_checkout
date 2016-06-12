@@ -1,6 +1,8 @@
 ---
 
-dependencies: []
+dependencies:
+  - role: debops.secret
+    tags: [ 'depend::secret', 'depend::secret:git_checkout', 'depend-of::git_checkout', 'type::dependency:hard' ]
 
 
 galaxy_info:
