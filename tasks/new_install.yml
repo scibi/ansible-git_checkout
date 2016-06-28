@@ -5,7 +5,7 @@
   command: git '--git-dir={{ git_checkout_src_path }}' '--work-tree={{ git_checkout_app_path }}'  init
   args:
     creates: '{{ git_checkout_src_path }}'
-  sudo_user: '{{ git_checkout_user }}'
+  become_user: '{{ git_checkout_user }}'
 
 - name: 'Create app directory ({{ git_checkout_app_path }})'
   file:
@@ -19,16 +19,16 @@
   command: git remote add origin '{{ git_checkout_repo_url }}'
   args:
     chdir: '{{ git_checkout_src_path }}'
-  sudo_user: '{{ git_checkout_user }}'
+  become_user: '{{ git_checkout_user }}'
 
 - name: Fetch remote branches and tags
   command: git fetch --all --tags
   args:
     chdir: '{{ git_checkout_src_path }}'
-  sudo_user: '{{ git_checkout_user }}'
+  become_user: '{{ git_checkout_user }}'
 
 - name: Checkout correct version
   command: git checkout '{{ git_checkout_version }}'
   args:
     chdir: '{{ git_checkout_src_path }}'
-  sudo_user: '{{ git_checkout_user }}'
+  become_user: '{{ git_checkout_user }}'
