@@ -1,27 +1,15 @@
 ---
 
-- name: git_checkout__deploy_key_token
-  debug:
-    msg: '{{ git_checkout__deploy_key_token }}'      
-
 - name: Slurp the deploy key
   slurp:
     src: '{{ git_checkout__app_home_path }}/.ssh/id_rsa.pub'
   register: git_checkout__register_deploy_key
-
-- name: git_checkout__register_deploy_key
-  debug:
-    msg: '{{ git_checkout__register_deploy_key }}'
 
 - name: Create a json formatted deploy key
   set_fact:
     git_checkout__register_deploy_key_data:
       title: '{{ git_checkout__name }}@{{ ansible_fqdn }} deployed by Ansible'
       key: '{{ git_checkout__register_deploy_key.content | b64decode | trim }}'
-
-- name: git_checkout__register_deploy_key_data
-  debug:
-    msg: '{{ git_checkout__register_deploy_key_data }}'
 
 # Deploy on GitLab server
 
@@ -43,9 +31,9 @@
     status_code: '200,201'
   when: git_checkout__git_service_type == 'gitlab'
 
-# Deploy on Github
+# Deploy on GitHub
 #
-#FIXME: add Github support
+#FIXME: add GitHub support
 
 - name: Add server key do known hosts
   known_hosts:
