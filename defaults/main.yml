@@ -1,4 +1,19 @@
 ---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# Default variables
+# =================
+
+# .. contents:: Sections
+#    :local:
+
+
+# .. Basic settings [[[1
+#
+# -------------------
+#   Basic settings
+# -------------------
+
 
 # .. envvar:: git_checkout__name
 #
@@ -6,33 +21,36 @@
 # git_checkout__register_status[git_checkout__name]
 git_checkout__name: 'sample_checkout'
 
+
+# .. envvar:: git_checkout__version
+#
+# What version (branch, tag or commit id) to checkout
+git_checkout__version: 'master'
+
+
+# .. Checkout paths and user [[[1
+#
+# ---------------------------
+#   Checkout paths and user
+# ---------------------------
+
+
 # .. envvar:: git_checkout__src_path
-# FIXME
+#
 # Path of the bare repository
 git_checkout__src_path: '{{ ansible_local.root.src + "/" + git_checkout__name }}'
 
+
 # .. envvar:: git_checkout__app_root_path
-# FIXME
-# Application installation directory
+#
+# Application installation directory. It's the path of the git working tree. Usually the same as ``git_checkout__app_home_path`` or its subdirectory.
 git_checkout__app_path: '{{ ansible_local.root.app + "/" + git_checkout__name }}'
 
+
 # .. envvar:: git_checkout__app_home_path
-# FIXME
-# Application installation directory
-git_checkout__app_home_path: '{{ ansible_local.root.app + "/" + git_checkout__name }}'
-
-# Git service data
-# This role supports GitHub and GitLab
-git_checkout__git_service_host: 'github.com'
-git_checkout__git_service_type: "{% if 'github' in git_checkout__git_service_host %}github{% else %}gitlab{% endif %}"
-git_checkout__git_service_account: '{{ git_checkout__name }}'
-git_checkout__git_service_repo: '{{ git_checkout__name }}'
-git_checkout__git_service_sshkey: False
-
-# .. envvar:: git_checkout__repo_url:
 #
-# Upstream repository URL
-git_checkout__repo_url: '{% if git_checkout__deploy_key_enable|bool %}git@{{ git_checkout__git_service_host }}:{% else %}https://{{ git_checkout__git_service_host }}/{% endif %}{{ git_checkout__git_service_account }}/{{ git_checkout__git_service_repo }}.git'
+# Home directory of ``git_checkout__user``. Usually the same as ``git_checkout__app_path`` or its parrent.
+git_checkout__app_home_path: '{{ ansible_local.root.app + "/" + git_checkout__name }}'
 
 
 # .. envvar:: git_checkout__user
@@ -47,12 +65,68 @@ git_checkout__user: '{{ git_checkout__name }}'
 git_checkout__group: '{{ git_checkout__name }}'
 
 
-# .. envvar:: git_checkout__version
+# .. Git service configuration [[[1
 #
-# What version (branch, tag or commit id) to checkout
-git_checkout__version: 'master'
+# --------------------
+#   Git service data
+# --------------------
+#
+# This role supports GitHub and GitLab
 
+
+# .. envvar:: git_checkout__git_service_host
+#
+# Git service FQDN. If the project is hosted od GitLab set it to your GitLab FQDN.
+git_checkout__git_service_host: 'github.com'
+
+
+# .. envvar:: git_checkout__git_service_type
+#
+# Git service type. Can be either ``github`` or ``gitlab``
+git_checkout__git_service_type: "{% if 'github' in git_checkout__git_service_host %}github{% else %}gitlab{% endif %}"
+
+
+# .. envvar:: git_checkout__git_service_account
+#
+# Git service account name
+git_checkout__git_service_account: '{{ git_checkout__name }}'
+
+
+# .. envvar:: git_checkout__git_service_repo
+#
+# Git service repository name
+git_checkout__git_service_repo: '{{ git_checkout__name }}'
+
+
+# .. envvar:: git_checkout__git_service_sshkey
+#
+# SSH key of the git host. Should be the same format as line in ssh known_hosts file.
+git_checkout__git_service_sshkey: False
+
+
+# .. envvar:: git_checkout__repo_url:
+#
+# Upstream repository URL
+git_checkout__repo_url: '{% if git_checkout__deploy_key_enable|bool %}git@{{ git_checkout__git_service_host }}:{% else %}https://{{ git_checkout__git_service_host }}/{% endif %}{{ git_checkout__git_service_account }}/{{ git_checkout__git_service_repo }}.git'
+
+
+# .. Deploy key configuration [[[1
+#
+# ----------------------------
+#   Deploy key configuration
+# ----------------------------
+#
+# This role can automatically add a deploy key using GitHub or GitLab (TODO) API.
+
+
+# .. envvar:: git_checkout__deploy_key_enable
+#
+# Enable deploy key support
 git_checkout__deploy_key_enable: False
 
+
+# .. envvar:: git_checkout__deploy_key_token
+#
+# API token for your git service
 git_checkout__deploy_key_token: "{{ lookup('file', secret + '/git_checkout/' + git_checkout__repo_url | replace('/', '_') | replace('@', '_') | replace(':', '_') + '/token' ) }}"
 
