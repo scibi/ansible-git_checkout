@@ -5,29 +5,29 @@
     state: 'latest'
     install_recommends: False
 
-- name: 'Check if {{ git_checkout_name }} is checked out'
+- name: 'Check if {{ git_checkout__name }} is checked out'
   stat:
-    path: '{{ git_checkout_app_path }}'
-  register: git_checkout_register_app_directory
+    path: '{{ git_checkout__app_path }}'
+  register: git_checkout__register_app_directory
 
 - name: Make sure home directory and its parents exists
   file:
-    path: '{{ git_checkout_app_home_path }}'
+    path: '{{ git_checkout__app_home_path }}'
     state: 'directory'
     recurse: 'yes'
 
-- name: 'Create {{ git_checkout_group }} group'
+- name: 'Create {{ git_checkout__group }} group'
   group:
-    name: '{{ git_checkout_group }}'
+    name: '{{ git_checkout__group }}'
     system: True
     state: 'present'
 
-- name: 'Create {{ git_checkout_user }} user'
+- name: 'Create {{ git_checkout__user }} user'
   user:
-    name: '{{ git_checkout_user }}'
-    group: '{{ git_checkout_group }}'
-    home: '{{ git_checkout_app_home_path }}'
-    comment: '{{ git_checkout_name }}'
+    name: '{{ git_checkout__user }}'
+    group: '{{ git_checkout__group }}'
+    home: '{{ git_checkout__app_home_path }}'
+    comment: '{{ git_checkout__name }}'
     generate_ssh_key: True
     append: True
     system: True
@@ -35,34 +35,34 @@
 
 - name: Set owner and permissions of home dir
   file:
-    path: '{{ git_checkout_app_home_path }}'
+    path: '{{ git_checkout__app_home_path }}'
     state: 'directory'
-    owner: '{{ git_checkout_user }}'
-    group: '{{ git_checkout_group }}'
+    owner: '{{ git_checkout__user }}'
+    group: '{{ git_checkout__group }}'
     mode: '0755'
 
 - include: deploy_key.yml
-  when: '{{ git_checkout_deploy_key_enable }}'
+  when: '{{ git_checkout__deploy_key_enable }}'
 
-#- name: git_checkout_src_path
+#- name: git_checkout__src_path
 #  debug:
-#    msg: '{{ git_checkout_src_path }}'
+#    msg: '{{ git_checkout__src_path }}'
 #
-#- name: git_checkout_app_path
+#- name: git_checkout__app_path
 #  debug:
-#    msg: '{{ git_checkout_app_path }}'
+#    msg: '{{ git_checkout__app_path }}'
 
 - name: Check if bare repository is cloned
   stat:
-    path: '{{ git_checkout_src_path }}'
-  register: git_checkout_register_repo_cloned
+    path: '{{ git_checkout__src_path }}'
+  register: git_checkout__register_repo_cloned
 
-#- name: git_checkout_register_repo_cloned
+#- name: git_checkout__register_repo_cloned
 #  debug:
-#    msg: '{{ git_checkout_register_repo_cloned }}'
+#    msg: '{{ git_checkout__register_repo_cloned }}'
 
 - include: new_install.yml
-  when: not git_checkout_register_repo_cloned.stat.exists
+  when: not git_checkout__register_repo_cloned.stat.exists
 
 - include: update.yml
 
@@ -70,29 +70,29 @@
 #################
 - name: Set output facts
   set_fact:
-    git_checkout_register_status_tmp:
-      updated: '{{ git_checkout_register_old_head.stdout != git_checkout_register_new_head.stdout }}'
-      new_install: '{{ not git_checkout_register_repo_cloned.stat.exists }}'
-      changed: '{{ (git_checkout_register_old_head.stdout != git_checkout_register_new_head.stdout) or not git_checkout_register_repo_cloned.stat.exists }}'
-      checkout_path: '{{ git_checkout_app_path }}'
+    git_checkout__register_status_tmp:
+      updated: '{{ git_checkout__register_old_head.stdout != git_checkout__register_new_head.stdout }}'
+      new_install: '{{ not git_checkout__register_repo_cloned.stat.exists }}'
+      changed: '{{ (git_checkout__register_old_head.stdout != git_checkout__register_new_head.stdout) or not git_checkout__register_repo_cloned.stat.exists }}'
+      checkout_path: '{{ git_checkout__app_path }}'
 
-#- name: git_checkout_register_status_tmp
+#- name: git_checkout__register_status_tmp
 #  debug:
-#    msg: '{{ git_checkout_register_status_tmp }}'
+#    msg: '{{ git_checkout__register_status_tmp }}'
 
-- name: Make sure git_checkout_register_status is a dict
+- name: Make sure git_checkout__register_status is a dict
   set_fact:
-    git_checkout_register_status: '{{ git_checkout_register_status|d({}) }}'
+    git_checkout__register_status: '{{ git_checkout__register_status|d({}) }}'
 
-#- name: git_checkout_register_status
+#- name: git_checkout__register_status
 #  debug:
-#    msg: '{{ git_checkout_register_status }}'
+#    msg: '{{ git_checkout__register_status }}'
 
-- name: Update git_checkout_register_status
+- name: Update git_checkout__register_status
   set_fact:
-    git_checkout_register_status: '{{ dict(git_checkout_register_status.items() + [(git_checkout_name, git_checkout_register_status_tmp)]) }}'
+    git_checkout__register_status: '{{ dict(git_checkout__register_status.items() + [(git_checkout__name, git_checkout__register_status_tmp)]) }}'
 
-- name: git_checkout_register_status
+- name: git_checkout__register_status
   debug:
-    msg: '{{ git_checkout_register_status }}'
+    msg: '{{ git_checkout__register_status }}'
 

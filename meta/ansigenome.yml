@@ -19,5 +19,5 @@ ansigenome_info:
   synopsis: |
     This role checks out any git repository. It's meant to be used as a dependency
     where it can be specified multiple times. Result is saved to the dict
-    `git_checkout_register_status` under a key `git_checkout_name`.
+    `git_checkout__register_status` under a key `git_checkout__name`.
 

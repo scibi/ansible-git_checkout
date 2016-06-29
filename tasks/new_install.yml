@@ -2,33 +2,33 @@
 
 
 - name: Create empty git repository
-  command: git '--git-dir={{ git_checkout_src_path }}' '--work-tree={{ git_checkout_app_path }}'  init
+  command: git '--git-dir={{ git_checkout__src_path }}' '--work-tree={{ git_checkout__app_path }}'  init
   args:
-    creates: '{{ git_checkout_src_path }}'
-  become_user: '{{ git_checkout_user }}'
+    creates: '{{ git_checkout__src_path }}'
+  become_user: '{{ git_checkout__user }}'
 
-- name: 'Create app directory ({{ git_checkout_app_path }})'
+- name: 'Create app directory ({{ git_checkout__app_path }})'
   file:
-    path: '{{ git_checkout_app_path }}'
+    path: '{{ git_checkout__app_path }}'
     state: 'directory'
-    owner: '{{ git_checkout_user }}'
-    group: '{{ git_checkout_group }}'
+    owner: '{{ git_checkout__user }}'
+    group: '{{ git_checkout__group }}'
     mode: '0755'
 
 - name: Add git remote
-  command: git remote add origin '{{ git_checkout_repo_url }}'
+  command: git remote add origin '{{ git_checkout__repo_url }}'
   args:
-    chdir: '{{ git_checkout_src_path }}'
-  become_user: '{{ git_checkout_user }}'
+    chdir: '{{ git_checkout__src_path }}'
+  become_user: '{{ git_checkout__user }}'
 
 - name: Fetch remote branches and tags
   command: git fetch --all --tags
   args:
-    chdir: '{{ git_checkout_src_path }}'
-  become_user: '{{ git_checkout_user }}'
+    chdir: '{{ git_checkout__src_path }}'
+  become_user: '{{ git_checkout__user }}'
 
 - name: Checkout correct version
-  command: git checkout '{{ git_checkout_version }}'
+  command: git checkout '{{ git_checkout__version }}'
   args:
-    chdir: '{{ git_checkout_src_path }}'
-  become_user: '{{ git_checkout_user }}'
+    chdir: '{{ git_checkout__src_path }}'
+  become_user: '{{ git_checkout__user }}'

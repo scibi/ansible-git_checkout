@@ -3,62 +3,62 @@
 - name: Save current checkout hash for update
   command: git rev-parse HEAD
   args:
-    chdir: '{{ git_checkout_src_path }}'
-  register: git_checkout_register_old_head
+    chdir: '{{ git_checkout__src_path }}'
+  register: git_checkout__register_old_head
   changed_when: False
-  sudo_user: '{{ git_checkout_user }}'
+  sudo_user: '{{ git_checkout__user }}'
 
-#- name: git_checkout_register_old_head.stdout
+#- name: git_checkout__register_old_head.stdout
 #  debug:
-#    msg: '{{ git_checkout_register_old_head.stdout }}'
+#    msg: '{{ git_checkout__register_old_head.stdout }}'
 
 - name: Fetch remote branches and tags
   command: git fetch --all --tags
   args:
-    chdir: '{{ git_checkout_src_path }}'
-  sudo_user: '{{ git_checkout_user }}'
-  register: git_checkout_register_git_fetch
-  changed_when: "git_checkout_register_git_fetch.stderr != ''"
+    chdir: '{{ git_checkout__src_path }}'
+  sudo_user: '{{ git_checkout__user }}'
+  register: git_checkout__register_git_fetch
+  changed_when: "git_checkout__register_git_fetch.stderr != ''"
 
 - name: Checkout correct version
-  command: git checkout '{{ git_checkout_version }}'
+  command: git checkout '{{ git_checkout__version }}'
   args:
-    chdir: '{{ git_checkout_src_path }}'
-  sudo_user: '{{ git_checkout_user }}'
+    chdir: '{{ git_checkout__src_path }}'
+  sudo_user: '{{ git_checkout__user }}'
 
 - name: Get current branch name
   command:  git symbolic-ref --short -q HEAD
   args:
-    chdir: '{{ git_checkout_src_path }}'
-  register: git_checkout_register_branch_name
+    chdir: '{{ git_checkout__src_path }}'
+  register: git_checkout__register_branch_name
   changed_when: False
   ignore_errors: True
-  sudo_user: '{{ git_checkout_user }}'
+  sudo_user: '{{ git_checkout__user }}'
 
-#- name: git_checkout_register_branch_name
+#- name: git_checkout__register_branch_name
 #  debug:
-#    msg: '{{ git_checkout_register_branch_name }}'
+#    msg: '{{ git_checkout__register_branch_name }}'
 
 - name: Git pull in case of current branch update
   command: git pull
   args:
-    chdir: '{{ git_checkout_app_path }}'
+    chdir: '{{ git_checkout__app_path }}'
   environment:
-    GIT_DIR: '{{ git_checkout_src_path }}'
-  sudo_user: '{{ git_checkout_user }}'
-  register: git_checkout_register_git_pull
-  changed_when: "git_checkout_register_git_pull.stdout != 'Already up-to-date.'"
-  when: "git_checkout_register_branch_name.rc == 0"
+    GIT_DIR: '{{ git_checkout__src_path }}'
+  sudo_user: '{{ git_checkout__user }}'
+  register: git_checkout__register_git_pull
+  changed_when: "git_checkout__register_git_pull.stdout != 'Already up-to-date.'"
+  when: "git_checkout__register_branch_name.rc == 0"
 
 - name: Save current checkout hash for update
   shell: git rev-parse HEAD
   args:
-    chdir: '{{ git_checkout_src_path }}'
-  register: git_checkout_register_new_head
+    chdir: '{{ git_checkout__src_path }}'
+  register: git_checkout__register_new_head
   changed_when: False
-  sudo_user: '{{ git_checkout_user }}'
+  sudo_user: '{{ git_checkout__user }}'
 
-#- name: git_checkout_register_new_head.stdout
+#- name: git_checkout__register_new_head.stdout
 #  debug:
-#    msg: '{{ git_checkout_register_new_head.stdout }}'
+#    msg: '{{ git_checkout__register_new_head.stdout }}'
 
