@@ -10,8 +10,8 @@ galaxy_info:
   description: ''
   company: 'DebOps'
   license: 'GNU General Public License v3'
-  min_ansible_version: '2.0.0'
-  # There was a bug in 2.1.0: https://github.com/ansible/ansible/issues/16320#issuecomment-227912789
+  min_ansible_version: '2.1.1'
+  # There was a bug introduced in 2.1.0: https://github.com/ansible/ansible/issues/16320#issuecomment-227912789
   platforms:
   - name: Ubuntu
     versions:

@@ -6,7 +6,7 @@
     chdir: '{{ git_checkout__src_path }}'
   register: git_checkout__register_old_head
   changed_when: False
-  sudo_user: '{{ git_checkout__user }}'
+  become_user: '{{ git_checkout__user }}'
 
 #- name: git_checkout__register_old_head.stdout
 #  debug:
@@ -16,7 +16,7 @@
   command: git fetch --all --tags
   args:
     chdir: '{{ git_checkout__src_path }}'
-  sudo_user: '{{ git_checkout__user }}'
+  become_user: '{{ git_checkout__user }}'
   register: git_checkout__register_git_fetch
   changed_when: "git_checkout__register_git_fetch.stderr != ''"
 
@@ -24,7 +24,7 @@
   command: git checkout '{{ git_checkout__version }}'
   args:
     chdir: '{{ git_checkout__src_path }}'
-  sudo_user: '{{ git_checkout__user }}'
+  become_user: '{{ git_checkout__user }}'
 
 - name: Get current branch name
   command:  git symbolic-ref --short -q HEAD
@@ -33,7 +33,7 @@
   register: git_checkout__register_branch_name
   changed_when: False
   ignore_errors: True
-  sudo_user: '{{ git_checkout__user }}'
+  become_user: '{{ git_checkout__user }}'
 
 #- name: git_checkout__register_branch_name
 #  debug:
@@ -45,7 +45,7 @@
     chdir: '{{ git_checkout__app_path }}'
   environment:
     GIT_DIR: '{{ git_checkout__src_path }}'
-  sudo_user: '{{ git_checkout__user }}'
+  become_user: '{{ git_checkout__user }}'
   register: git_checkout__register_git_pull
   changed_when: "git_checkout__register_git_pull.stdout != 'Already up-to-date.'"
   when: "git_checkout__register_branch_name.rc == 0"
@@ -56,9 +56,21 @@
     chdir: '{{ git_checkout__src_path }}'
   register: git_checkout__register_new_head
   changed_when: False
-  sudo_user: '{{ git_checkout__user }}'
+  become_user: '{{ git_checkout__user }}'
 
 #- name: git_checkout__register_new_head.stdout
 #  debug:
 #    msg: '{{ git_checkout__register_new_head.stdout }}'
 
+- name: Update submodules
+  command: git '--git-dir={{ git_checkout__src_path }}' submodule update 
+  args:
+    chdir: '{{ git_checkout__app_path }}'
+  become_user: '{{ git_checkout__user }}'
+  register: git_checkout__register_submodule_update
+  changed_when: "git_checkout__register_submodule_update.stdout != ''"
+  when: '{{ git_checkout__submodules_enable }}'
+
+- name: git_checkout__register_submodule_update
+  debug:
+    msg: '{{ git_checkout__register_submodule_update }}'

@@ -71,9 +71,9 @@
 - name: Set output facts
   set_fact:
     git_checkout__register_status_tmp:
-      updated: '{{ git_checkout__register_old_head.stdout != git_checkout__register_new_head.stdout }}'
+      updated: "{{ (git_checkout__register_old_head.stdout != git_checkout__register_new_head.stdout) or (git_checkout__submodules_enable and git_checkout__register_submodule_update.stdout != '') }}"
       new_install: '{{ not git_checkout__register_repo_cloned.stat.exists }}'
-      changed: '{{ (git_checkout__register_old_head.stdout != git_checkout__register_new_head.stdout) or not git_checkout__register_repo_cloned.stat.exists }}'
+      changed: "{{ ((git_checkout__register_old_head.stdout != git_checkout__register_new_head.stdout) or (git_checkout__submodules_enable and git_checkout__register_submodule_update.stdout != '')) or not git_checkout__register_repo_cloned.stat.exists }}"
       checkout_path: '{{ git_checkout__app_path }}'
 
 #- name: git_checkout__register_status_tmp

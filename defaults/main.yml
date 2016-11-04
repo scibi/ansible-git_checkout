@@ -130,3 +130,4 @@ git_checkout__deploy_key_enable: False
 # API token for your git service
 git_checkout__deploy_key_token: "{{ lookup('file', secret + '/git_checkout/' + git_checkout__repo_url | replace('/', '_') | replace('@', '_') | replace(':', '_') + '/token' ) }}"
 
+git_checkout__submodules_enable: False

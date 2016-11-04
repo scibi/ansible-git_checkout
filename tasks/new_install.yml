@@ -32,3 +32,11 @@
   args:
     chdir: '{{ git_checkout__src_path }}'
   become_user: '{{ git_checkout__user }}'
+
+- name: Init submodules
+  command: git '--git-dir={{ git_checkout__src_path }}' submodule init
+  args:
+    chdir: '{{ git_checkout__app_path }}'
+  when: '{{ git_checkout__submodules_enable }}'
+  become_user: '{{ git_checkout__user }}'
+

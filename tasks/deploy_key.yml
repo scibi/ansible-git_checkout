@@ -39,5 +39,5 @@
   known_hosts:
     name: '{{ git_checkout__git_service_host }}'
     key: '{{ git_checkout__git_service_sshkey }}'  
-  sudo_user: '{{ git_checkout__user }}'
+  become_user: '{{ git_checkout__user }}'
   when: git_checkout__git_service_sshkey
