@@ -1,4 +1,8 @@
 ---
+- name: Prepare git environment
+  set_fact:
+    git_checkout__register_git_environment: '{{ lookup("template", "lookup/git_environment.j2") | from_yaml }}'
+
 - name: Make sure git is installed
   apt:
     name: 'git'

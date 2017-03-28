@@ -21,10 +21,24 @@
     chdir: '{{ git_checkout__src_path }}'
   become_user: '{{ git_checkout__user }}'
 
+- name: Disable git password prompt
+  command: git config --local core.askpass /bin/true 
+  args:
+    chdir: '{{ git_checkout__src_path }}'
+  become_user: '{{ git_checkout__user }}'
+
+- name: 'Add git credential helper if needed'
+  command: "git config --local credential.helper '!f() { echo \"username=${GIT_USER}\\npassword=${GIT_PASSWORD}\"; }; f'"
+  args:
+    chdir: '{{ git_checkout__src_path }}'
+  become_user: '{{ git_checkout__user }}'
+  when: '{{ git_checkout__git_service_user != False }}'
+
 - name: Fetch remote branches and tags
   command: git fetch --all --tags
   args:
     chdir: '{{ git_checkout__src_path }}'
+  environment: '{{ git_checkout__register_git_environment }}'
   become_user: '{{ git_checkout__user }}'
 
 - name: Checkout correct version
@@ -37,6 +51,7 @@
   command: git '--git-dir={{ git_checkout__src_path }}' submodule init
   args:
     chdir: '{{ git_checkout__app_path }}'
+  environment: '{{ git_checkout__register_git_environment }}'
   when: '{{ git_checkout__submodules_enable }}'
   become_user: '{{ git_checkout__user }}'
 

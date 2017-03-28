@@ -103,6 +103,15 @@ git_checkout__git_service_repo: '{{ git_checkout__name }}'
 # SSH key of the git host. Should be the same format as line in ssh known_hosts file.
 git_checkout__git_service_sshkey: False
 
+# .. envvar:: git_checkout__git_service_user
+#
+# User to login as when using HTTPS.
+git_checkout__git_service_user: False
+
+# .. envvar:: git_checkout__git_service_password
+#
+# Password to use when using HTTPS.
+git_checkout__git_service_password: "{% if  git_checkout__git_service_user != False %}{{ lookup('file', secret + '/git_checkout/' + git_checkout__repo_url | replace('/', '_') | replace('@', '_') | replace(':', '_') + '/' + git_checkout__git_service_user + '/password' ) }}{% endif %}"
 
 # .. envvar:: git_checkout__repo_url:
 #

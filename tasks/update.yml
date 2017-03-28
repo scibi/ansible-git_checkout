@@ -18,6 +18,7 @@
     chdir: '{{ git_checkout__src_path }}'
   become_user: '{{ git_checkout__user }}'
   register: git_checkout__register_git_fetch
+  environment: '{{ git_checkout__register_git_environment }}'
   changed_when: "git_checkout__register_git_fetch.stderr != ''"
 
 - name: Checkout correct version
@@ -43,8 +44,7 @@
   command: git pull
   args:
     chdir: '{{ git_checkout__app_path }}'
-  environment:
-    GIT_DIR: '{{ git_checkout__src_path }}'
+  environment: '{{ git_checkout__register_git_environment }}'
   become_user: '{{ git_checkout__user }}'
   register: git_checkout__register_git_pull
   changed_when: "git_checkout__register_git_pull.stdout != 'Already up-to-date.'"

@@ -1,0 +1,5 @@
+{% if  git_checkout__git_service_user != False %}
+GIT_USER: '{{ git_checkout__git_service_user }}'
+GIT_PASSWORD: '{{ git_checkout__git_service_password }}'
+{% endif %}
+GIT_DIR: '{{ git_checkout__src_path }}'
