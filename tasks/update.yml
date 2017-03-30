@@ -67,6 +67,7 @@
   args:
     chdir: '{{ git_checkout__app_path }}'
   become_user: '{{ git_checkout__user }}'
+  environment: '{{ git_checkout__register_git_environment }}'
   register: git_checkout__register_submodule_update
   changed_when: "git_checkout__register_submodule_update.stdout != ''"
   when: '{{ git_checkout__submodules_enable }}'
