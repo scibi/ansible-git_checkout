@@ -28,7 +28,7 @@
   become_user: '{{ git_checkout__user }}'
 
 - name: 'Add git credential helper if needed'
-  command: "git config --global credential.helper '!f() { echo \"username=${GIT_USER}\\npassword=${GIT_PASSWORD}\"; }; f'"
+  command: "git config --global credential.helper '!f() { sleep 1; echo \"username=${GIT_USER}\\npassword=${GIT_PASSWORD}\"; }; f'"
   args:
     chdir: '{{ git_checkout__src_path }}'
   become_user: '{{ git_checkout__user }}'
