@@ -45,7 +45,7 @@
     group: '{{ git_checkout__group }}'
     mode: '0755'
 
-- include: deploy_key.yml
+- import_tasks: deploy_key.yml
   when: '{{ git_checkout__deploy_key_enable }}'
 
 #- name: git_checkout__src_path
@@ -65,10 +65,10 @@
 #  debug:
 #    msg: '{{ git_checkout__register_repo_cloned }}'
 
-- include: new_install.yml
+- import_tasks: new_install.yml
   when: not git_checkout__register_repo_cloned.stat.exists
 
-- include: update.yml
+- import_tasks: update.yml
 
 
 #################
