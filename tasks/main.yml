@@ -46,7 +46,7 @@
     mode: '0755'
 
 - import_tasks: deploy_key.yml
-  when: '{{ git_checkout__deploy_key_enable }}'
+  when: git_checkout__deploy_key_enable
 
 #- name: git_checkout__src_path
 #  debug:
