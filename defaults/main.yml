@@ -134,6 +134,11 @@ git_checkout__repo_url: '{% if git_checkout__deploy_key_enable|bool %}git@{{ git
 git_checkout__deploy_key_enable: False
 
 
+# .. envvar:: git_checkout__deploy_key_user
+#
+# API user to manage deploy key (used only for GitHub)
+git_checkout__deploy_key_user: "{{ git_checkout__git_service_account }}"
+
 # .. envvar:: git_checkout__deploy_key_token
 #
 # API token for your git service

@@ -1,0 +1,17 @@
+---
+
+- name: Manage git checkouts 
+  hosts: [ 'debops_service_git_checkout' ]
+  become: True
+
+  environment: '{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}'
+
+  roles:
+
+    - role: secret
+      tags: [ 'role::secret', 'role::git_checkout' ]
+
+    - role: debops.git_checkout
+      tags: [ 'role::git_checkout' ]

@@ -19,7 +19,7 @@
   become_user: '{{ git_checkout__user }}'
   register: git_checkout__register_git_fetch
   environment: '{{ git_checkout__register_git_environment }}'
-  changed_when: "git_checkout__register_git_fetch.stderr != ''"
+  changed_when: git_checkout__register_git_fetch.stderr != ''
 
 - name: Checkout correct version
   command: git checkout '{{ git_checkout__version }}'
@@ -47,8 +47,8 @@
   environment: '{{ git_checkout__register_git_environment }}'
   become_user: '{{ git_checkout__user }}'
   register: git_checkout__register_git_pull
-  changed_when: "git_checkout__register_git_pull.stdout != 'Already up-to-date.'"
-  when: "git_checkout__register_branch_name.rc == 0"
+  changed_when: git_checkout__register_git_pull.stdout != 'Already up-to-date.'
+  when: git_checkout__register_branch_name.rc == 0
 
 - name: Save current checkout hash for update
   shell: git rev-parse HEAD
@@ -69,8 +69,8 @@
   become_user: '{{ git_checkout__user }}'
   environment: '{{ git_checkout__register_git_environment }}'
   register: git_checkout__register_submodule_update
-  changed_when: "git_checkout__register_submodule_update.stdout != ''"
-  when: '{{ git_checkout__submodules_enable }}'
+  changed_when: git_checkout__register_submodule_update.stdout != ''
+  when: git_checkout__submodules_enable
 
 - name: git_checkout__register_submodule_update
   debug:

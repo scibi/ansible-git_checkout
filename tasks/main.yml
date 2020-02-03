@@ -9,7 +9,7 @@
     state: 'latest'
     install_recommends: False
 
-- name: 'Check if {{ git_checkout__name }} is checked out'
+- name: Check if {{ git_checkout__name }} is checked out
   stat:
     path: '{{ git_checkout__app_path }}'
   register: git_checkout__register_app_directory
@@ -20,13 +20,13 @@
     state: 'directory'
     recurse: 'yes'
 
-- name: 'Create {{ git_checkout__group }} group'
+- name: Create {{ git_checkout__group }} group
   group:
     name: '{{ git_checkout__group }}'
     system: True
     state: 'present'
 
-- name: 'Create {{ git_checkout__user }} user'
+- name: Create {{ git_checkout__user }} user
   user:
     name: '{{ git_checkout__user }}'
     group: '{{ git_checkout__group }}'

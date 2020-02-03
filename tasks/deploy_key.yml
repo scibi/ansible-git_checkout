@@ -11,29 +11,27 @@
       title: '{{ git_checkout__name }}@{{ ansible_fqdn }} deployed by Ansible'
       key: '{{ git_checkout__register_deploy_key.content | b64decode | trim }}'
 
-# Deploy on GitLab server
-
-- name: Get the Gitlab repo id
+- name: Transfer the deploy key to GitLab
   uri:
-    url: 'https://{{ git_checkout__git_service_host }}/api/v3/projects/{{ git_checkout__git_service_account }}%2F{{ git_checkout__git_service_repo }}'
-    HEADER_PRIVATE-TOKEN: '{{ git_checkout__deploy_key_token }}'
-  register: git_checkout__register_gitlab_response
-  when: git_checkout__git_service_type == 'gitlab'
-
-# Have to use this syntax. Using colons leads to TypeError: unhashable type
-- name: Transfer the deploy key to Gitlab
-  uri:
-    url: 'https://{{ git_checkout__git_service_host }}/api/v3/projects/{{ git_checkout__register_gitlab_response.json.id }}/keys'
+    url: 'https://{{ git_checkout__git_service_host }}/api/v4/projects/{{ git_checkout__git_service_account }}%2F{{ git_checkout__git_service_repo }}/deploy_keys'
     method: 'POST'
     body_format: 'json'
     body: '{{ git_checkout__register_deploy_key_data }}'
-    HEADER_PRIVATE-TOKEN: '{{ git_checkout__deploy_key_token }}'
+    headers:
+            Private-Token: '{{ git_checkout__deploy_key_token }}'
     status_code: '200,201'
   when: git_checkout__git_service_type == 'gitlab'
 
-# Deploy on GitHub
-#
-#FIXME: add GitHub support
+- name: Transfer the deploy key to GitHub
+  uri:
+    url: 'https://api.github.com/repos/{{ git_checkout__git_service_account }}/{{ git_checkout__git_service_repo }}/keys'
+    method: 'POST'
+    body_format: 'json'
+    body: '{{ git_checkout__register_deploy_key_data }}'
+    url_username: '{{ git_checkout__deploy_key_user }}'
+    url_password: '{{ git_checkout__deploy_key_token }}'
+    status_code: '200,201'
+  when: git_checkout__git_service_type == 'github'
 
 - name: Add server key do known hosts
   known_hosts:

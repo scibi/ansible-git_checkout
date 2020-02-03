@@ -1,19 +1,20 @@
 ---
 
 
-- name: Create empty git repository
-  command: git '--git-dir={{ git_checkout__src_path }}' '--work-tree={{ git_checkout__app_path }}'  init
-  args:
-    creates: '{{ git_checkout__src_path }}'
-  become_user: '{{ git_checkout__user }}'
-
-- name: 'Create app directory ({{ git_checkout__app_path }})'
+- name: Create app directory ({{ git_checkout__app_path }})
   file:
     path: '{{ git_checkout__app_path }}'
     state: 'directory'
     owner: '{{ git_checkout__user }}'
     group: '{{ git_checkout__group }}'
     mode: '0755'
+
+  # It's not possible to use git module if repository requires http authentication. It doesn't user credential helper
+- name: Create empty git repository
+  command: git --git-dir={{ git_checkout__src_path }} --work-tree={{ git_checkout__app_path }} init
+  args:
+    creates: '{{ git_checkout__src_path }}'
+  become_user: '{{ git_checkout__user }}'
 
 - name: Add git remote
   command: git remote add origin '{{ git_checkout__repo_url }}'
@@ -27,12 +28,12 @@
     chdir: '{{ git_checkout__src_path }}'
   become_user: '{{ git_checkout__user }}'
 
-- name: 'Add git credential helper if needed'
+- name: Add git credential helper if needed
   command: "git config --global credential.helper '!f() { sleep 1; echo \"username=${GIT_USER}\\npassword=${GIT_PASSWORD}\"; }; f'"
   args:
     chdir: '{{ git_checkout__src_path }}'
   become_user: '{{ git_checkout__user }}'
-  when: '{{ git_checkout__git_service_user != False }}'
+  when: git_checkout__git_service_user != False
 
 - name: Fetch remote branches and tags
   command: git fetch --all --tags
@@ -52,6 +53,6 @@
   args:
     chdir: '{{ git_checkout__app_path }}'
   environment: '{{ git_checkout__register_git_environment }}'
-  when: '{{ git_checkout__submodules_enable }}'
+  when: git_checkout__submodules_enable
   become_user: '{{ git_checkout__user }}'
 
